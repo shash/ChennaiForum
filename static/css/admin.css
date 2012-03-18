@@ -1,0 +1,308 @@
+body {
+	background: #FFF;
+	font-family:verdana; font-size:11px; line-height:160%;
+	margin: 0;
+	padding: 0;
+    color: #636362;
+}
+
+img {
+	border: 0;
+}
+
+#container {
+	width: 700px;
+	margin: 0;
+	margin-left: auto;
+	margin-right: auto;
+	padding: 0;
+}
+
+#banner {
+	padding: 0;
+	margin-bottom: 0;
+	background-color: #30608F;
+}
+
+#content_div {
+	padding: 0;
+	margin-top: 10px;
+}
+
+#footer {
+	clear: both;
+	padding: 0;
+	margin-top: 0;
+	font-family:verdana; 
+	font-size:10px; 
+	line-height:12px;
+	border-top: 1px solid #CCC;
+	border-bottom: 1px solid #CCC;
+	background-color: #F0F0F0;
+}
+
+#logo {
+	margin: 0;
+	padding: 20px 0px 0px 30px;
+}
+
+#logo h1{
+	color: white;
+}
+
+#logo h1 a{
+	color: white;
+	text-decoration: none;	
+}
+
+p {
+	padding: 5px 10px 5px 10px;
+	color: #636362;
+}
+
+h3 {
+	padding: 5px 10px 5px 10px;
+	color: #636362;
+	font-size: 13px;
+}
+
+a {
+	color: #3366CC;
+}
+
+a:hover {
+	color: #78A400;
+}
+
+/*-- Navigatsioon --*/
+
+
+#navcontainer ul {
+	margin: 0;
+	padding: 5px 5px 0 0;
+	list-style-type: none;
+	float: right;
+}
+
+#navcontainer ul li { 
+	display: inline; 
+    border-bottom: 0;
+    padding: 0;
+
+}
+
+#navcontainer ul li a {
+	text-decoration: none;
+	display: block;
+	float: left;
+	padding: 3px 10px 6px 10px;
+	margin: 3px 2px;
+	color: #fff;
+	background: #30608F;
+	border:1px solid #F1F0F0;
+}
+
+#navcontainer ul li a:hover {
+	background: #F1F0F0;
+	color: #30608F;
+}
+
+
+.red {
+	color: red;
+}
+
+/*-- input --*/
+
+input, textarea {
+	background-color: #fff;
+	border: 1px solid #CECECE;
+	font-size: 12px;
+	padding: 3px;
+	color: #3366CC;
+}
+
+input:focus {
+	background-color: #EAEFFA;
+	border: 1px solid #CCC;
+}
+
+li {
+	list-style-type: none;
+	padding: 5px;
+	margin: 0;
+	border-bottom: 1px solid #CCC;
+}
+
+ul {
+	margin: 0;
+	padding: 0;
+}
+
+h1{
+	font-size: 24px;
+	font-weight: normal;
+}
+
+h1 small{
+	font-size: 13px;
+}
+
+h2{
+	font-size: 18px;
+	font-weight: normal;
+}
+
+.formatted{
+	margin:0;
+	padding:0;
+	border-left: 1px solid #F1F0F0;
+	border-top: 1px solid #F1F0F0;
+	margin: 10px 0; 
+}
+
+.formatted thead tr{
+	background-color: #30608F;
+	color: white;
+	font-weight: bold;
+}
+.formatted td{
+	padding: 2px 5px;
+	border-right: 1px solid #F1F0F0;
+	border-bottom: 1px solid #F1F0F0;
+}
+
+#removed, #updated, #saved{
+	border: 1px solid #F1F0F0;
+	padding: 5px 15px;
+	margin: 5px 0;
+	font-size: 86%;
+}
+
+.stay_low{
+	font-style: italic;
+	color: #CCC;
+}
+
+.medialist{
+	height: 120px;
+	overflow: auto;
+	border: 1px solid #30608F;
+	margin: 0;
+	padding:5px;
+}
+
+.mediaupload{
+	border: 1px solid #30608F;
+	margin: 0;
+	padding:5px;
+}
+
+.medialist_files{
+
+}
+
+.medialist_file{
+	width: 80px;
+	height: 60px;
+	padding: 0px;
+	border: 1px solid #F1F0F0;
+	margin: 0px 0px 1px 1px;
+	background-color: #FAFAFA;
+	background-position: center center;
+	background-repeat: no-repeat;
+	float: left;
+	overflow:hidden;
+	position: relative;
+}
+
+.medialist_file_text{
+	font-size: 10px;
+	color: white;
+	background: #4096EE;
+	margin:0;
+	padding:0;
+	line-height: 100%;
+	float: left;
+}
+
+.medialist_file_selected{
+	border: 1px solid #FF7400;
+}
+
+.medialist_file_overlay{
+	width: 80px;
+	height: 60px;
+	position: absolute;
+	left: 0px;
+	top:0px;
+}
+
+.medialist_file_background{
+	width: 80px;
+	height: 60px;
+	position: absolute;
+	z-index: 100;
+	left: 0px;
+	top:0px;
+	background-color: #666;
+	opacity:0.6;
+	filter:alpha(opacity=60);
+}
+
+.medialist_file_button{
+	position:relative;
+	z-index: 1000;
+	cursor: pointer;
+	margin: 3px;
+	padding: 2px;
+	background: #FAFAFA;
+	border: 1px solid #F1F0F0;
+	font-size: 10px;
+	color: black;
+	text-align: center;
+	line-height: 100%;
+	overflow: hidden;
+}
+
+.medialist_file_button_mouseover{
+	background: #4096EE;
+	color: white;
+}
+
+.tabs{
+	margin:0;
+	padding:0;
+	margin-left: 10px;
+}
+
+.tab{
+	float: left;
+	padding:5px 15px;
+	position: relative;
+	top: 1px;
+	border: 1px solid #30608F;
+	margin:0;
+	margin-right: -1px;
+	cursor: pointer;
+	background: #F1F0F0;
+	-moz-border-radius-topleft: 4px;
+	-webkit-border-top-left-radius: 4px;
+	-moz-border-radius-topright: 4px;
+	-webkit-border-top-right-radius: 4px;
+}
+
+.selected_tab{
+	background: white;
+	border-bottom: 1px solid white;
+}
+
+.error_msg{
+	margin: 2px 0;
+	background: #D01F3C;
+	font-size: 12px;
+	color: white;
+	padding: 3px 10px;
+	-moz-border-radius: 3px;
+	-webkit-border-radius: 3px;
+}

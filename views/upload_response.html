@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+		<script>
+			if(parent && 'upload_response' in parent){
+				try{
+					parent.upload_response({
+						'status': '{{ status }}',
+						'type': '{{ type }}',
+						'key': '{{ key }}',
+						'name': "{{ name|addslashes }}",
+						'description': "{{ description|addslashes }}",
+						'width': {{ width }},
+						'height': {{ height }}
+					})
+				}catch(E){
+					alert('An error has appeared :S');
+				}
+			}
+		</script>
+	</head>
+	<body>
+	</body>
+</html>

@@ -1,0 +1,222 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <title>{% if page.title %}{{ page.title }} | {% endif %}{{ site_title }}</title>
+    <link href="/feed" rel="alternate" type="application/rss+xml" title="RSS" />
+
+    <style type="text/css">
+    body {
+        background: #FFF;
+        font-family:verdana; font-size:11px; line-height:160%;
+        margin: 0;
+        padding: 0;
+        color: #636362;
+    }
+
+    img {
+        border: 0;
+    }
+
+    #container {
+        width: 700px;
+        margin: 0;
+        margin-left: auto;
+        margin-right: auto;
+        padding: 0;
+    }
+
+    #banner {
+        padding: 0;
+        margin-bottom: 0;
+        background-color: #73880A;
+    }
+
+    #content_div {
+        padding: 0;
+        margin-top: 10px;
+    }
+
+    #footer {
+        clear: both;
+        padding: 0;
+        margin-top: 0;
+        font-family:verdana; 
+        font-size:10px; 
+        line-height:12px;
+        border-top: 1px solid #CCC;
+        border-bottom: 1px solid #CCC;
+        background-color: #F0F0F0;
+    }
+
+    #logo {
+        margin: 0;
+        padding: 20px 0px 0px 30px;
+    }
+
+    #logo h1{
+        color: white;
+    }
+
+    #logo h1 a{
+        color: white;
+        text-decoration: none;    
+    }
+
+    p {
+        padding: 5px 10px 5px 10px;
+        color: #636362;
+    }
+
+    h3 {
+        padding: 5px 10px 5px 10px;
+        color: #636362;
+        font-size: 13px;
+    }
+
+    a {
+        color: #3366CC;
+    }
+
+    a:hover {
+        color: #78A400;
+    }
+
+    #navcontainer ul {
+        margin: 0;
+        padding: 5px 5px 0 0;
+        list-style-type: none;
+        float: right;
+    }
+
+    #navcontainer ul li { 
+        display: inline; 
+        border-bottom: 0;
+        padding: 0;
+    }
+
+    #navcontainer ul li a {
+        text-decoration: none;
+        display: block;
+        float: left;
+        padding: 3px 10px 6px 10px;
+        margin: 3px 2px;
+        color: #fff;
+        background: #30608F;
+        border:1px solid #F1F0F0;
+    }
+
+    #navcontainer ul li a:hover {
+        background: #F1F0F0;
+        color: #30608F;
+    }
+
+    .red {
+        color: red;
+    }
+
+    input, textarea {
+        background-color: #fff;
+        border: 1px solid #CECECE;
+        font-size: 12px;
+        padding: 3px;
+        color: #3366CC;
+    }
+
+    input:focus {
+        background-color: #EAEFFA;
+        border: 1px solid #CCC;
+    }
+
+    li {
+        list-style-type: none;
+        padding: 5px;
+        margin: 0;
+        border-bottom: 1px solid #CCC;
+    }
+
+    ul {
+        margin: 0;
+        padding: 0;
+    }
+
+    h1{
+        font-size: 24px;
+        font-weight: normal;
+    }
+
+    h1 small{
+        font-size: 13px;
+    }
+    
+    h2{
+        font-size: 18px;
+        font-weight: normal;
+    }
+    
+    h2 small{
+        font-size: 12px;
+    }
+    
+    h2 a{
+    	text-decoration: none;
+    }
+    
+    h2 a:hover{
+    	text-decoration: underline;
+    }
+    </style>
+
+    <link rel="shortcut icon" href="/favicon.ico" />
+</head>
+<body>
+
+<div id="container">
+    <div id="banner">
+
+        <div id="logo">
+            <h1>
+        		<a href="/"><img src="/template/turbinecms.png" alt="{{ site_title|escape }}" /></a><br />
+                <small>{{ description }}</small>
+            </h1>
+        </div>
+        
+        <div id="navcontainer">
+            <ul>
+                <li><a href="/">Home</a></li>
+                {% for link in links %}
+                <li><a href="/page/{{ link.url|escape }}">{{ link.title|escape }}</a></li>
+                {% endfor %}
+            </ul>
+            <div style="clear: both"></div>
+        </div>
+
+    </div>
+
+    <div id="content_div">
+
+        <h1>{% if page.title %}{{ page.title }}{% else %}{{ site_title }}{% endif %}
+        {% if page.owner %}<br /><small>{{ page.created|date:"l, j M. Y"}}</small>{% endif %}
+        </h1>
+
+        <div>{{page.content}}</div>
+        
+        {% if subpages %}
+        	<div style="border-top: 1px #CCC"></div>
+        	{% for subpage in subpages %}
+        		<div style="background: {% cycle #FAFAFA,#FFFFFF %}; padding: 10px;">
+        			<h2><a href="/page/{{ subpage.url|escape }}">{{ subpage.title|escape }}</a><br />
+        			<small>{{ subpage.created|date:"l, j M. Y"}}</small></h2>
+        			<div>{{ subpage.content|truncatewords_html:30 }}
+        			<a href="/page/{{ subpage.url|escape }}">read more...</a></div>
+        		</div>
+        	{% endfor %}
+        {% endif %}
+
+    </div>
+
+    <div id="footer"><p>&copy; 2009 <a href="http://www.turbinecms.com/">TurbineCMS</a>. <a href="/admin">Admin</a></p></div>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,125 @@
+{% extends "admin.html" %}
+
+{% block head %}
+<script>
+$(document).observe('dom:loaded', function(){
+
+	// Notify the user if a page was added/saved by blinking it with green
+	if($('row_{{ saved }}')){
+		$('row_{{ saved }}').setStyle('background: #00FF00; color: #FFFFFF;');
+		$('row_{{ saved }}').morph('background: #FFFFFF; color: #111111');
+	}
+	
+	// Notify the user with a red blink that a page was deleted
+	if($('removed')){
+		$('removed').setStyle('background: #FFFF00; color: #FFFFFF;');
+		$('removed').morph('background:#FFFFFF; color: #111111;');
+	}
+	
+	// Notify the user with a yellow blink if site settings were updated
+	if($('updated')){
+		$('updated').setStyle('background: #00FF00; color: #FFFFFF;');
+		$('updated').morph('background:#FFFFFF; color: #111111;');
+	}
+});
+</script>
+{% endblock %}
+
+{% block content %}
+
+{% if removed %}
+	<p id="removed">Page deleted</p>
+{% endif %}
+
+{% if updated %}
+	<p id="updated">Site settings updated</p>
+{% endif %}
+
+<table class="formatted" width="100%" cellspacing="0" cellpadding="0">
+	<thead>
+		<tr>
+			<td width="440">Title</td>
+			<td width="120">Status</td>
+			<td>&nbsp;</td>
+			<td>&nbsp;</td>
+		</tr>
+	</thead>
+	<tbody>
+		{% if pages %}
+			{% for page in pages %}
+				<tr id="row_{{page.key}}">
+					<td>
+						{% if page.draft %}
+							{{ page.title|escape }}
+						{% else %}
+							<a href="/page/{{ page.url|escape }}">{{ page.title|escape }}<a/>
+						{% endif %}
+						{% if front %}{% ifequal page.url front%} (<span class="stay_low">Frontpage</span>){% endifequal%}{% endif %}
+					</td>
+					<td>
+						{% if page.draft %}
+							Draft, <a href="/admin/publish?key={{page.key}}">Publish</a>
+						{% else %}
+							{% if front %}
+								{% ifequal page.url front %}
+										Active
+									{% else %}
+										Active, <a href="/admin/unpublish?key={{page.key}}">Unpublish</a>
+								{% endifequal %}
+							{% endif %}
+						{% endif %}
+					</td>
+					<td>
+						<a href="/admin/edit/{{ page.url|escape }}">Edit</a>
+					</td>
+					<td>
+						<a href="/admin/remove/{{ page.url|escape }}" onclick="return confirm('Are you sure? This action cannot be undone!')">Remove</a>
+					</td>
+				</tr>
+				
+				{% for subpage in page.page_set %}
+				<tr id="row_{{subpage.key}}">
+					<td style="padding-left: 30px">
+						<a href="/page/{{ subpage.url|escape }}">{{ subpage.title|escape }}<a/>{% if front %}{% ifequal subpage.url front%} (<span class="stay_low">Frontpage</span>){% endifequal%}{% endif %}
+					</td>
+					<td>
+						{% if subpage.draft %}
+							Draft, <a href="/admin/publish?key={{subpage.key}}">Publish</a>
+						{% else %}
+							{% if front %}
+								{% ifequal subpage.url front %}
+										Active
+									{% else %}
+										Active, <a href="/admin/unpublish?key={{subpage.key}}">Unpublish</a>
+								{% endifequal %}
+							{% endif %}
+						{% endif %}
+					</td>
+					<td>
+						<a href="/admin/edit/{{ subpage.url|escape }}">Edit</a>
+					</td>
+					<td>
+						<a href="/admin/remove/{{ subpage.url|escape }}" onclick="return confirm('Are you sure? This action cannot be undone!')">Remove</a>
+					</td>
+				</tr>
+				{% endfor %}
+				
+			{% endfor %}
+		{% else %}
+			<tr>
+				<td colspan="4">
+					No pages yet, <a href="/admin/add">create one to get started!</a>
+				</td>
+			</tr>
+		{% endif %}
+	</tbody>
+</table>
+
+<p>
+	{% if pages %}
+		<a href="/admin/add">Add new page</a><br/>
+	{% endif %}
+	<a href="/admin/site">Edit site settings</a>
+</p>
+
+{% endblock %}

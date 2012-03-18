@@ -1,0 +1,62 @@
+{% extends "admin.html" %}
+
+{% block head %}
+<script>
+// Enable/disable own template editing 
+changeown = function(){
+	if($('use_own_template').checked){
+		$('own_template').show();
+	}else{
+		$('own_template').hide();
+	}
+}
+
+$(document).observe('dom:loaded', function(){
+	$('use_own_template').observe('change', changeown);
+	$('use_own_template').observe('click', changeown);
+	changeown();
+});
+</script>
+{% endblock %}
+
+{% block content %}
+
+<form method="post" action="/admin/site">
+
+	<table style="width:100%">
+		<tr>
+			<td>
+				<label for="title">Site title</label>
+			</td>
+			<td>
+				<input type="text" name="title" id="title" value="{% if site_title %}{{ site_title|escape }}{% endif %}" />
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<label for="description">Description</label>
+			</td>
+			<td>
+				<input type="text" name="description" id="description" style="width: 500px" value="{% if description %}{{ description|escape }}{% endif %}" />
+			</td>
+		</tr>
+		<tr>
+			<td colspan="2">
+				<input type="checkbox" id="use_own_template" name="use_own_template" {% if templateDefault %}{% else %}checked="CHECKED"{% endif %} /><label for="use_own_template">Use own template</label>
+			</td>
+		</tr>
+		<tr id="own_template">
+			<td colspan="2">
+				<textarea name="templateText" id="templateText" style="width: 100%; height: 240px; font-size: 12px; font-family: monospace;" wrap="off">{% if templateText %}{{ templateText|escape }}{% endif %}</textarea>
+			</td>
+		</tr>		
+		<tr>
+			<td colspan="2">
+				<input type="submit" name="ok" value="Save site settings" />
+			</td>
+		</tr>
+	</table>
+
+</form>
+
+{% endblock %}

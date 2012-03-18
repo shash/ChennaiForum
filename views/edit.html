@@ -1,0 +1,343 @@
+{% extends "admin.html" %}
+
+{% block head %}
+<script>
+// Initialize TinyMCE
+tinyMCE.init({
+	plugins : "inlinepopups",
+	mode : "textareas",
+	theme : "advanced",
+	theme_advanced_buttons1 : "formatselect, bold,italic,underline,strikethrough,|,justifyleft,justifycenter,justifyright,justifyfull,|,bullist,numlist,|,outdent,indent,|,undo,redo,|,link,unlink,image,|,code,hr,sub,sup,|,forecolor,backcolor",
+	theme_advanced_buttons2 : "",
+	theme_advanced_buttons3 : "",
+	theme_advanced_toolbar_location : "top",
+	theme_advanced_toolbar_align : "left",
+	theme_advanced_statusbar_location : "bottom",
+	relative_urls : false
+});
+
+// Strip function for strings
+strip = function(str){
+	if(str){
+		return str.replace(/^\s+|\s+$/g,"");
+	}
+	else{
+		return '';
+	}
+};
+
+// URL cleaner (removes non ASCII chars)
+clean_url = function(url){
+	function convert(match){
+		var conversion = {
+			'õ':'o', 'ä':'a', 'ö':'o', 'ü':'u', 'š':'s', 'ž':'z', ' ':'-', 'а':'a', 'б':'b', 'в':'v', 'г':'g', 'д':'d', 'е':'e', 'ё':'o', 'ж':'s', 'з':'z', 'и':'i', 'й':'i', 'к':'k', 'л':'l', 'м':'m', 'н':'n', 'о':'o', 'п':'p', 'р':'r', 'с':'s', 'т':'t', 'у':'u', 'ф':'f', 'х':'h', 'ц':'z', 'ч':'z', 'ш':'s', 'щ':'s', 'ы':'o', 'э':'e', 'ю':'ju', 'я':'ja', 'ā':'a', 'č':'c', 'ē':'e', 'ģ':'g', 'ī':'i', 'ķ':'k', 'ļ':'l', 'ņ':'n', 'ū':'u', 'ñ':'n', 'ß':'ss', 'ą':'a', 'ę':'e', 'ė':'e', 'į':'i', 'ų':'u'
+		}
+		return conversion[match] || '';
+	}
+	url = url.toLowerCase().replace(/[^A-Za-z\-0-9]/g, convert);
+	url = url.replace(/\-+/g,'-');
+	if(!url.length){
+		url = 'page';
+	}
+	return url;
+};
+
+// Changes the url
+urlchange = function(){
+	var title = strip($('title').value);
+	$('url').value = clean_url(title);
+	$('url_str').innerHTML = clean_url(title);
+};
+
+
+// Enables/disables the $('published') checkbox according to the state of $('front') checkbox
+frontchange = function(){
+	if($('front').checked){
+		$('draft').checked = false;
+		$('draft').disabled = true;
+	}else{
+		$('draft').disabled = false;
+		$('draft').checked = {% if draft %}true{% else %}false{% endif %};
+	}
+};
+
+function swap_tab(active){
+	if(active=="upload"){
+		$('upload_tab').addClassName('selected_tab');
+		$('manager_tab').removeClassName('selected_tab');
+		$('mediaupload').show();
+		$('medialist').hide();
+	}else{
+		$('upload_tab').removeClassName('selected_tab');
+		$('manager_tab').addClassName('selected_tab');
+		$('mediaupload').hide();
+		$('medialist').show();	
+	}
+}
+
+function insert_to_media(data, position){
+	var elm = new Element('div', {className:'medialist_file'})
+	if(data.type=='IMAGE'){
+		elm.setStyle({
+			backgroundImage:'url(/image/thumb/'+data.key+'/'+data.name+')'
+		});
+	}else{
+		elm.setStyle({
+			backgroundImage:'url(/template/open_alt.png)'
+		});
+		elm.insert(new Element('div', {className: 'medialist_file_text'}).update(data.name));
+	}
+	elm.title = data.description;
+
+	// Menu overlay, for inserting the image/file to the page or deleting it from the media library
+	var overlay = new Element('div', {className:'medialist_file_overlay', style:'display: none'});
+
+	var button_background = new Element('div',{className:'medialist_file_background'});	
+	var button_insert = new Element('div',{className:'medialist_file_button'}).update('Insert to page');
+	var button_delete = new Element('div',{className:'medialist_file_button'}).update('Remove file');
+	
+	button_insert.observe('mouseover', function(){
+		button_insert.addClassName('medialist_file_button_mouseover');
+	});
+	button_delete.observe('mouseover', function(){
+		button_delete.addClassName('medialist_file_button_mouseover');
+	});
+
+	button_insert.observe('mouseout', function(){
+		button_insert.removeClassName('medialist_file_button_mouseover');
+	});
+	button_delete.observe('mouseout', function(){
+		button_delete.removeClassName('medialist_file_button_mouseover');
+	});
+
+	var hide_overlay = false;
+	button_insert.observe('click', function(){
+		var ed = tinyMCE.activeEditor
+		ed.focus();
+		if(data.type=='IMAGE'){
+			ed.selection.setContent('<img src="#{src}"/>'.interpolate({
+				src: '/image/full/'+data.key+'/'+data.name
+			}));
+		}else{
+			ed.selection.setContent('<a href="#{src}">#{name}</a>#{description}'.interpolate({
+				src: '/download/'+data.key+'/'+data.name,
+				name: data.name,
+				description: data.description.length?' ('+data.description+')':''
+			}));
+		}
+		hide_overlay = true;
+		window.setTimeout(function(){hide_overlay = false;}, 10);
+		overlay.hide();
+	});
+
+	button_delete.observe('click', function(){
+		if(confirm("Are you sure?\nThis action cannot be undone!")){
+			elm.fade({duration:0.8});
+			var myAjax = new Ajax.Request('/admin/remove-media',{
+				method: 'post',
+				postBody: "key="+encodeURIComponent(data.key),
+				onComplete: function(response){
+					
+				}
+			});
+		}
+	});
+	
+	overlay.insert(button_background)
+	overlay.insert(button_insert)
+	overlay.insert(button_delete)
+	
+	elm.insert({top: overlay});
+
+	elm.observe('mouseover', function(){
+		elm.addClassName('medialist_file_selected');
+		if(!hide_overlay)
+			overlay.show();
+	})
+	elm.observe('mouseout', function(){
+		elm.removeClassName('medialist_file_selected');
+		overlay.hide();
+	});
+	return elm;
+}
+
+function upload_response(data){
+	$('upload_submit').disabled=false;
+	$('upload_wait').hide();
+	$('file').replace(new Element('input',{type:'file', name:'file', id:'file'}));
+	if(data.status!='OK'){
+		$('upload_messages').show()
+		var msg = new Element('div',{className:'error_msg', style:"display:none"}).update('There was an error with uploading the file. Check if the file is under 1 MB.');
+		$('upload_messages').down('td').insert(msg);
+		msg.appear({duration: 0.8});
+		window.setTimeout(function(){
+			msg.fade({duration:0.8})
+		},20*1000)
+	}else{
+		
+		var elm = insert_to_media(data);	
+		$('medialist_files').insert({top:elm});
+		
+		swap_tab('manager');
+		elm.highlight({startcolor:'#FF7400', endcolor:'#FAFAFA'});
+	}
+}
+
+var files = {{ files }};
+
+$(document).observe('dom:loaded', function(){
+	
+	{% if page %}
+	{% else %}
+		// This function is activated only if this is a new page
+		$('title').observe('change', urlchange);
+		$('title').observe('keyup', urlchange);
+		urlchange();
+	{% endif %}
+	
+	// If the $('front') checkbox state is changed, run frontchage()
+	$('front').observe('click', frontchange);
+	$('front').observe('change', frontchange);
+	frontchange(); // Initial run (when the browser has set the checkbox with cached state etc.)
+	
+	
+	// Handle media manager tabs
+	 
+	$('upload_tab').observe('click', function(){
+		swap_tab('upload');
+	})
+
+	$('manager_tab').observe('click', function(){
+		swap_tab('manager');
+	})
+	
+	$('upload_submit').disabled=false;
+	
+	if(files){
+		for(var i=0; i<files.length; i++){
+			try{
+				var elm = insert_to_media(files[i]);
+				$('medialist_files').insert({bottom:elm});
+				
+			}catch(E){}
+		}
+	}
+})
+</script>
+
+{% endblock %}
+
+{% block content %}
+
+<form method="post" action="/admin/edit">
+	<input type="hidden" name="key" value="{% if page %}{{ page.key }}{% endif %}" />
+	<input type="hidden" name="url" id="url" value="{% if url %}{{ url|escape }}{% else %}page{% endif %}" />
+	<table style="width:100%">
+		<tr>
+			<td width="150">
+				<label for="title" width="120">Page title</label>
+			</td>
+			<td>
+				<input type="text" name="title" id="title" style="width: 300px;" value="{% if page %}{{ page.title|escape }}{% endif %}" />
+			</td>
+		</tr>
+		<tr>
+			<td colspan="2">
+				<input type="checkbox" name="front" id="front" {% if front %}checked="CHECKED"{% endif %}/>
+				<label for="front">Use this page as the site front page</label>
+				{% if front %}<br />NB! You can't remove a page from the front page by unchecking the checkbox - the only way is to replace it with an another page by setting it as the front page.{% endif %}
+			</td>
+		</tr>
+		<tr>
+			<td colspan="2">		
+				<input type="checkbox" name="draft" id="draft" {% if draft %}checked="CHECKED"{% endif %}/>
+				<label for="published">Draft</label>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				Page URL
+			</td>
+			<td style="font-weight: bold;">
+				/page/<span id="url_str">{% if url %}{{ url|escape }}{% else %}page{% endif %}</span>
+			</td>
+		</tr>
+		<tr>
+			<td width="150">
+				<label for="owner" width="120">Parent</label>
+			</td>
+			<td>
+				<select name="owner" id="owner">
+				<option value=""> - Top -</option>
+				{% for link in links %}
+
+				<option value="{{ link.key|escape }}"{% ifequal owner link.key %} selected="SELECTED"{% endifequal%}>{{ link.title|escape }}</option>
+				{% endfor %}
+				</select>
+			</td>
+		</tr>
+		<tr>
+			<td colspan="2">
+				<label for="content">Page content</label>
+			</td>
+		</tr>
+		<tr>
+			<td colspan="2">
+				<textarea name="content" id="content" style="width: 100%; height: 240px;">{% if page %}{{ page.content|escape }}{% endif %}</textarea>
+			</td>
+		</tr>
+		<tr>
+			<td colspan="2">
+				<input type="submit" name="ok" value="Save page" />
+			</td>
+		</tr>
+	</table>
+</form>
+
+<h2>Images and files</h2>
+
+{% spaceless %}
+<div class="tabs"><div class="tab selected_tab" id="upload_tab">Upload</div><div class="tab" id="manager_tab">Manager</div><div style="clear: both; overflow:hidden;"></div></div><div id="mediaupload" class="mediaupload">
+	<form method="post" style="margin:0;padding:0;" enctype="multipart/form-data" action="/admin/upload" target="upload_target" onsubmit="$('upload_wait').show(); $('upload_submit').disabled=true;">
+		<table style="width: 100%">
+			<tr>
+				<td>
+					<label for="file" width="120">Select file</label>
+				</td>
+				<td>
+					<input type="file" name="file" id="file" />
+				</td>
+			</tr>
+			<tr>
+				<td colspan="2">
+					<span class="stay_low">NB! Max. file size 1 MB.</span>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<label for="description" width="120">Description</label>
+				</td>
+				<td>
+					<input type="text" name="description" id="description" style="width: 500px"/>
+				</td>
+			</tr>
+			<tr id="upload_messages">
+				<td colspan="2"></td>
+			</tr>
+			<tr>
+				<td colspan="2">
+					<input type="submit" id="upload_submit" name="ok" value="Upload file" /> <img id="upload_wait" style="display: none" src="/template/wait.gif" />
+				</td>
+			</tr>
+		</table>
+	</form>
+	<iframe style="display:none" id="upload_target" name="upload_target"></iframe>
+</div><div id="medialist" class="medialist" style="display: none">
+	<div id="medialist_files" class="medialist_files">
+	</div>
+	<div style="clear:both"></div>
+</div>
+
+{% endspaceless %}
+
+{% endblock %}
